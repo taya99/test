@@ -21,16 +21,16 @@ jobs:
       - name: Check if devlop branch exists # devlopブランチが存在するか確認するステップ
         id: check_devlop_branch # ステップのIDを設定
         run: |
-          if git show-ref --verify --quiet refs/heads/devlop; then # devlopブランチが存在するか確認
+          if git ls-remote --heads origin devlop | grep devlop; then # devlopブランチが存在するか確認
             echo "Branch 'devlop' already exists." # 存在する場合のメッセージ
-            echo "::set-output name=exists::true" # 存在する場合の出力変数設定
+            echo "exists=true" >> $GITHUB_ENV # 存在する場合の出力変数設定
           else
             echo "Branch 'devlop' does not exist." # 存在しない場合のメッセージ
-            echo "::set-output name=exists::false" # 存在しない場合の出力変数設定
+            echo "exists=false" >> $GITHUB_ENV # 存在しない場合の出力変数設定
           fi
 
       - name: Create devlop branch if it does not exist # devlopブランチが存在しない場合に作成するステップ
-        if: steps.check_devlop_branch.outputs.exists == 'false' # devlopブランチが存在しない場合のみ実行
+        if: env.exists == 'false' # devlopブランチが存在しない場合のみ実行
         run: |
           git checkout -b devlop # 新しいdevlopブランチを作成
           git push origin devlop # リモートリポジトリにプッシュ
@@ -38,16 +38,16 @@ jobs:
       - name: Check if release branch exists # releaseブランチが存在するか確認するステップ
         id: check_release_branch # ステップのIDを設定
         run: |
-          if git show-ref --verify --quiet refs/heads/release; then # releaseブランチが存在するか確認
+          if git ls-remote --heads origin release | grep release; then # releaseブランチが存在するか確認
             echo "Branch 'release' already exists." # 存在する場合のメッセージ
-            echo "::set-output name=exists::true" # 存在する場合の出力変数設定
+            echo "exists=true" >> $GITHUB_ENV # 存在する場合の出力変数設定
           else
             echo "Branch 'release' does not exist." # 存在しない場合のメッセージ
-            echo "::set-output name=exists::false" # 存在しない場合の出力変数設定
+            echo "exists=false" >> $GITHUB_ENV # 存在しない場合の出力変数設定
           fi
 
       - name: Create release branch if it does not exist # releaseブランチが存在しない場合に作成するステップ
-        if: steps.check_release_branch.outputs.exists == 'false' # releaseブランチが存在しない場合のみ実行
+        if: env.exists == 'false' # releaseブランチが存在しない場合のみ実行
         run: |
           git checkout devlop # devlopブランチにチェックアウト
           git checkout -b release # 新しいreleaseブランチを作成
@@ -56,16 +56,16 @@ jobs:
       - name: Check if feature branch exists # featureブランチが存在するか確認するステップ
         id: check_feature_branch # ステップのIDを設定
         run: |
-          if git show-ref --verify --quiet refs/heads/feature; then # featureブランチが存在するか確認
+          if git ls-remote --heads origin feature | grep feature; then # featureブランチが存在するか確認
             echo "Branch 'feature' already exists." # 存在する場合のメッセージ
-            echo "::set-output name=exists::true" # 存在する場合の出力変数設定
+            echo "exists=true" >> $GITHUB_ENV # 存在する場合の出力変数設定
           else
             echo "Branch 'feature' does not exist." # 存在しない場合のメッセージ
-            echo "::set-output name=exists::false" # 存在しない場合の出力変数設定
+            echo "exists=false" >> $GITHUB_ENV # 存在しない場合の出力変数設定
           fi
 
       - name: Create feature branch if it does not exist # featureブランチが存在しない場合に作成するステップ
-        if: steps.check_feature_branch.outputs.exists == 'false' # featureブランチが存在しない場合のみ実行
+        if: env.exists == 'false' # featureブランチが存在しない場合のみ実行
         run: |
           git checkout release # releaseブランチにチェックアウト
           git checkout -b feature # 新しいfeatureブランチを作成
