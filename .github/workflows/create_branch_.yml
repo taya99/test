@@ -35,14 +35,6 @@ jobs:
           git checkout -b devlop # 新しいdevlopブランチを作成
           git push origin devlop # リモートリポジトリにプッシュ
 
-      - name: Pull devlop branch if it exists # devlopブランチが存在する場合の処理
-        if: steps.check_devlop_branch.outputs.exists == 'true' # devlopブランチが存在する場合のみ実行
-        run: |
-          git fetch origin devlop:devlop # リモートリポジトリからdevlopブランチをフェッチ
-          git checkout devlop # devlopブランチにチェックアウト
-          git pull origin devlop # リモートリポジトリのdevlopブランチをプル
-          git checkout main # mainブランチにチェックアウト
-
       - name: Check if release branch exists # releaseブランチが存在するか確認するステップ
         id: check_release_branch # ステップのIDを設定
         run: |
@@ -61,14 +53,6 @@ jobs:
           git checkout -b release # 新しいreleaseブランチを作成
           git push origin release # リモートリポジトリにプッシュ
 
-      - name: Pull release branch if it exists # releaseブランチが存在する場合の処理
-        if: steps.check_release_branch.outputs.exists == 'true' # releaseブランチが存在する場合のみ実行
-        run: |
-          git fetch origin # リモートリポジトリをフェッチ
-          git checkout release # releaseブランチにチェックアウト
-          git pull origin release # リモートリポジトリのreleaseブランチをプル
-          git checkout devlop # devlopブランチにチェックアウト
-
       - name: Check if feature branch exists # featureブランチが存在するか確認するステップ
         id: check_feature_branch # ステップのIDを設定
         run: |
@@ -86,10 +70,3 @@ jobs:
           git checkout release # releaseブランチにチェックアウト
           git checkout -b feature # 新しいfeatureブランチを作成
           git push origin feature # リモートリポジトリにプッシュ
-
-      - name: Pull feature branch if it exists # featureブランチが存在する場合の処理
-        if: steps.check_feature_branch.outputs.exists == 'true' # featureブランチが存在する場合のみ実行
-        run: |
-          git fetch origin # リモートリポジトリをフェッチ
-          git checkout feature # featureブランチにチェックアウト
-          git pull origin feature # リモートリポジトリのfeatureブランチをプル
