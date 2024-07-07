@@ -49,8 +49,15 @@ jobs:
       - name: Create release branch if it does not exist # releaseブランチが存在しない場合に作成するステップ
         if: steps.check_release_branch.outputs.exists == 'false' # releaseブランチが存在しない場合のみ実行
         run: |
-          git checkout -b release devlop # 新しいreleaseブランチをdevlopブランチから作成
+          git checkout devlop # devlopブランチにチェックアウト
+          git checkout -b release # 新しいreleaseブランチを作成
           git push origin release # リモートリポジトリにプッシュ
+        else: # releaseブランチが存在する場合
+        run: |
+          git fetch origin # リモートリポジトリをフェッチ
+          git checkout release # releaseブランチにチェックアウト
+          git pull origin release # リモートリポジトリのreleaseブランチをプル
+          git checkout devlop # devlopブランチにチェックアウト
 
       - name: Check if feature branch exists # featureブランチが存在するか確認するステップ
         id: check_feature_branch # ステップのIDを設定
@@ -66,5 +73,11 @@ jobs:
       - name: Create feature branch if it does not exist # featureブランチが存在しない場合に作成するステップ
         if: steps.check_feature_branch.outputs.exists == 'false' # featureブランチが存在しない場合のみ実行
         run: |
-          git checkout -b feature release # 新しいfeatureブランチをreleaseブランチから作成
+          git checkout release # releaseブランチにチェックアウト
+          git checkout -b feature # 新しいfeatureブランチを作成
           git push origin feature # リモートリポジトリにプッシュ
+        else: # featureブランチが存在する場合
+        run: |
+          git fetch origin # リモートリポジトリをフェッチ
+          git checkout feature # featureブランチにチェックアウト
+          git pull origin feature # リモートリポジトリのfeatureブランチをプル
