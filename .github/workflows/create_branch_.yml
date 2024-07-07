@@ -38,7 +38,7 @@ jobs:
       - name: Pull devlop branch if it exists # devlopブランチが存在する場合の処理
         if: steps.check_devlop_branch.outputs.exists == 'true' # devlopブランチが存在する場合のみ実行
         run: |
-          git fetch origin # リモートリポジトリをフェッチ
+          git fetch origin devlop:devlop # リモートリポジトリからdevlopブランチをフェッチ
           git checkout devlop # devlopブランチにチェックアウト
           git pull origin devlop # リモートリポジトリのdevlopブランチをプル
           git checkout main # mainブランチにチェックアウト
