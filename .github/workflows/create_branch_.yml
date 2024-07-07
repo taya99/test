@@ -35,6 +35,14 @@ jobs:
           git checkout -b devlop # 新しいdevlopブランチを作成
           git push origin devlop # リモートリポジトリにプッシュ
 
+      - name: Pull devlop branch if it exists # devlopブランチが存在する場合の処理
+        if: steps.check_devlop_branch.outputs.exists == 'true' # devlopブランチが存在する場合のみ実行
+        run: |
+          git fetch origin # リモートリポジトリをフェッチ
+          git checkout devlop # devlopブランチにチェックアウト
+          git pull origin devlop # リモートリポジトリのdevlopブランチをプル
+          git checkout main # mainブランチにチェックアウト
+
       - name: Check if release branch exists # releaseブランチが存在するか確認するステップ
         id: check_release_branch # ステップのIDを設定
         run: |
