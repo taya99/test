@@ -3,12 +3,14 @@ name: Create Branches
 on:
   workflow_dispatch:
     inputs:
-      system_id:
-        description: 'System Request ID (x-xxxxxx)'
+      system_request_number:
+        description: 'System Request Number'
         required: true
-      prod_date:
-        description: 'Production Registration Date (yyyymmdd)'
+        default: 'x-xxxxxx'
+      production_date:
+        description: 'Production Date (yyyymmdd)'
         required: true
+        default: 'yyyymmdd'
 
 jobs:
   create-branches:
@@ -26,33 +28,33 @@ jobs:
       - name: Check if devlop branch exists
         id: check_devlop_branch
         run: |
-          if git branch --list devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}; then
-            echo "Branch 'devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}' already exists."
-            echo "::set-output name=devlop_exists::true"
+          if git branch --list "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
+            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' already exists."
+            echo "EXISTS_DEVLOP=true" >> $GITHUB_ENV
           else
-            echo "Branch 'devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}' does not exist."
-            echo "::set-output name=devlop_exists::false"
+            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' does not exist."
+            echo "EXISTS_DEVLOP=false" >> $GITHUB_ENV
           fi
 
       - name: Create devlop branch if it does not exist
-        if: steps.check_devlop_branch.outputs.devlop_exists == 'false'
+        if: env.EXISTS_DEVLOP == 'false'
         run: |
-          git checkout -b devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}
-          git push origin devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}
+          git checkout -b "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
+          git push origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
 
       - name: Check if release branch exists
         id: check_release_branch
         run: |
-          if git branch --list release_${{ github.event.inputs.prod_date }}; then
-            echo "Branch 'release_${{ github.event.inputs.prod_date }}' already exists."
-            echo "::set-output name=release_exists::true"
+          if git branch --list "release_${{ github.event.inputs.production_date }}"; then
+            echo "Branch 'release_${{ github.event.inputs.production_date }}' already exists."
+            echo "EXISTS_RELEASE=true" >> $GITHUB_ENV
           else
-            echo "Branch 'release_${{ github.event.inputs.prod_date }}' does not exist."
-            echo "::set-output name=release_exists::false"
+            echo "Branch 'release_${{ github.event.inputs.production_date }}' does not exist."
+            echo "EXISTS_RELEASE=false" >> $GITHUB_ENV
           fi
 
       - name: Create release branch if it does not exist
-        if: steps.check_release_branch.outputs.release_exists == 'false'
+        if: env.EXISTS_RELEASE == 'false'
         run: |
-          git checkout -b release_${{ github.event.inputs.prod_date }}
-          git push origin release_${{ github.event.inputs.prod_date }}
+          git checkout -b "release_${{ github.event.inputs.production_date }}" "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
+          git push origin "release_${{ github.event.inputs.production_date }}"
