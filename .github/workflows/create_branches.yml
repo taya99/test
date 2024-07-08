@@ -1,60 +1,60 @@
-name: Create Branches
+name: Create Branches # ワークフローの名前
 
 on:
-  workflow_dispatch:
-    inputs:
-      system_request_number:
-        description: 'System Request Number'
-        required: true
-        default: 'x-xxxxxx'
-      production_date:
-        description: 'Production Date (yyyymmdd)'
-        required: true
-        default: 'yyyymmdd'
+  workflow_dispatch: # 手動でトリガーされるワークフローの設定
+    inputs: # ワークフローに渡される入力パラメータ
+      system_request_number: # システム依頼番号の入力
+        description: 'System Request Number' # 入力の説明
+        required: true # 必須入力
+        default: 'x-xxxxxx' # デフォルト値
+      production_date: # 本番登録日の入力
+        description: 'Production Date (yyyymmdd)' # 入力の説明
+        required: true # 必須入力
+        default: 'yyyymmdd' # デフォルト値
 
 jobs:
-  create-branches:
-    runs-on: ubuntu-latest
+  create-branches: # ジョブの名前
+    runs-on: ubuntu-latest # ジョブが実行される環境
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout repository # リポジトリのチェックアウト
+        uses: actions/checkout@v2 # GitHubの公式アクションを使用
 
-      - name: Set up Git
+      - name: Set up Git # Gitの設定
         run: |
-          git config --global user.name 'taya99'
-          git config --global user.email 'powerbomb_19@outlook.com'
+          git config --global user.name 'taya99' # グローバルユーザー名の設定
+          git config --global user.email 'powerbomb_19@outlook.com' # グローバルユーザーメールの設定
 
-      - name: Check if devlop branch exists
-        id: check_devlop_branch
+      - name: Check if devlop branch exists # devlopブランチの存在確認
+        id: check_devlop_branch # ステップのID
         run: |
           if git ls-remote --heads origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" | grep -q "refs/heads/devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
-            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' already exists."
-            echo "EXISTS_DEVLOP=true" >> $GITHUB_ENV
+            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' already exists." # ブランチが存在する場合のメッセージ
+            echo "EXISTS_DEVLOP=true" >> $GITHUB_ENV # 環境変数に存在フラグを設定
           else
-            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' does not exist."
-            echo "EXISTS_DEVLOP=false" >> $GITHUB_ENV
+            echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' does not exist." # ブランチが存在しない場合のメッセージ
+            echo "EXISTS_DEVLOP=false" >> $GITHUB_ENV # 環境変数に存在しないフラグを設定
           fi
 
-      - name: Create devlop branch if it does not exist
-        if: env.EXISTS_DEVLOP == 'false'
+      - name: Create devlop branch if it does not exist # devlopブランチが存在しない場合に作成
+        if: env.EXISTS_DEVLOP == 'false' # devlopブランチが存在しない場合の条件
         run: |
-          git checkout -b "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
-          git push origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
+          git checkout -b "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" # 新しいdevlopブランチを作成
+          git push origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" # 作成したブランチをプッシュ
 
-      - name: Check if release branch exists
-        id: check_release_branch
+      - name: Check if release branch exists # releaseブランチの存在確認
+        id: check_release_branch # ステップのID
         run: |
           if git ls-remote --heads origin "release_${{ github.event.inputs.production_date }}" | grep -q "refs/heads/release_${{ github.event.inputs.production_date }}"; then
-            echo "Branch 'release_${{ github.event.inputs.production_date }}' already exists."
-            echo "EXISTS_RELEASE=true" >> $GITHUB_ENV
+            echo "Branch 'release_${{ github.event.inputs.production_date }}' already exists." # ブランチが存在する場合のメッセージ
+            echo "EXISTS_RELEASE=true" >> $GITHUB_ENV # 環境変数に存在フラグを設定
           else
-            echo "Branch 'release_${{ github.event.inputs.production_date }}' does not exist."
-            echo "EXISTS_RELEASE=false" >> $GITHUB_ENV
+            echo "Branch 'release_${{ github.event.inputs.production_date }}' does not exist." # ブランチが存在しない場合のメッセージ
+            echo "EXISTS_RELEASE=false" >> $GITHUB_ENV # 環境変数に存在しないフラグを設定
           fi
 
-      - name: Create release branch if it does not exist
-        if: env.EXISTS_RELEASE == 'false'
+      - name: Create release branch if it does not exist # releaseブランチが存在しない場合に作成
+        if: env.EXISTS_RELEASE == 'false' # releaseブランチが存在しない場合の条件
         run: |
-          git checkout -b "release_${{ github.event.inputs.production_date }}" "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"
-          git push origin "release_${{ github.event.inputs.production_date }}"
+          git checkout -b "release_${{ github.event.inputs.production_date }}" "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" # 新しいreleaseブランチを作成
+          git push origin "release_${{ github.event.inputs.production_date }}" # 作成したブランチをプッシュ
