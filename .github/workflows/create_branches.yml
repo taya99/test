@@ -20,10 +20,10 @@ jobs:
       - name: Checkout repository # リポジトリのチェックアウト
         uses: actions/checkout@v4 # GitHubの公式アクションを使用
 
-      - name: Set up Git # Gitの設定
-        run: |
-          git config --global user.name 'taya99' # グローバルユーザー名の設定
-          git config --global user.email 'powerbomb_19@outlook.com' # グローバルユーザーメールの設定
+#       - name: Set up Git # Gitの設定
+#         run: |
+#           git config --global user.name 'taya99' # グローバルユーザー名の設定
+#           git config --global user.email 'powerbomb_19@outlook.com' # グローバルユーザーメールの設定
 
       - name: Check if devlop branch exists # devlopブランチの存在確認
         id: check_devlop_branch # ステップのID
