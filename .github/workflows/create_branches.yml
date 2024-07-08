@@ -1,0 +1,58 @@
+name: Create Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      system_id:
+        description: 'System Request ID (x-xxxxxx)'
+        required: true
+      prod_date:
+        description: 'Production Registration Date (yyyymmdd)'
+        required: true
+
+jobs:
+  create-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'taya99'
+          git config --global user.email 'powerbomb_19@outlook.com'
+
+      - name: Check if devlop branch exists
+        id: check_devlop_branch
+        run: |
+          if git branch --list devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}; then
+            echo "Branch 'devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}' already exists."
+            echo "::set-output name=devlop_exists::true"
+          else
+            echo "Branch 'devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}' does not exist."
+            echo "::set-output name=devlop_exists::false"
+          fi
+
+      - name: Create devlop branch if it does not exist
+        if: steps.check_devlop_branch.outputs.devlop_exists == 'false'
+        run: |
+          git checkout -b devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}
+          git push origin devlop_${{ github.event.inputs.system_id }}_${{ github.event.inputs.prod_date }}
+
+      - name: Check if release branch exists
+        id: check_release_branch
+        run: |
+          if git branch --list release_${{ github.event.inputs.prod_date }}; then
+            echo "Branch 'release_${{ github.event.inputs.prod_date }}' already exists."
+            echo "::set-output name=release_exists::true"
+          else
+            echo "Branch 'release_${{ github.event.inputs.prod_date }}' does not exist."
+            echo "::set-output name=release_exists::false"
+          fi
+
+      - name: Create release branch if it does not exist
+        if: steps.check_release_branch.outputs.release_exists == 'false'
+        run: |
+          git checkout -b release_${{ github.event.inputs.prod_date }}
+          git push origin release_${{ github.event.inputs.prod_date }}
