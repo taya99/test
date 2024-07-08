@@ -28,7 +28,7 @@ jobs:
       - name: Check if devlop branch exists
         id: check_devlop_branch
         run: |
-          if git branch --list "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
+          if git ls-remote --heads origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" | grep -q "refs/heads/devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
             echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' already exists."
             echo "EXISTS_DEVLOP=true" >> $GITHUB_ENV
           else
@@ -45,7 +45,7 @@ jobs:
       - name: Check if release branch exists
         id: check_release_branch
         run: |
-          if git branch --list "release_${{ github.event.inputs.production_date }}"; then
+          if git ls-remote --heads origin "release_${{ github.event.inputs.production_date }}" | grep -q "refs/heads/release_${{ github.event.inputs.production_date }}"; then
             echo "Branch 'release_${{ github.event.inputs.production_date }}' already exists."
             echo "EXISTS_RELEASE=true" >> $GITHUB_ENV
           else
