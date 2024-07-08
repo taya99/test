@@ -28,7 +28,8 @@ jobs:
       - name: Check if devlop branch exists # devlopブランチの存在確認
         id: check_devlop_branch # ステップのID
         run: |
-          if git ls-remote --heads origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" | grep -q "refs/heads/devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
+　　　　　if git ls-remote --heads origin "devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}" \
+             | grep -q "refs/heads/devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}"; then
             echo "Branch 'devlop_${{ github.event.inputs.system_request_number }}_${{ github.event.inputs.production_date }}' already exists." # ブランチが存在する場合のメッセージ
             echo "EXISTS_DEVLOP=true" >> $GITHUB_ENV # 環境変数に存在フラグを設定
           else
